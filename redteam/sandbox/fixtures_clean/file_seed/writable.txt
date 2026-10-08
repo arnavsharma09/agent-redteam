@@ -1,0 +1,1 @@
+This file is writable by the agent for testing purposes.

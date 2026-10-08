@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "agent-redteam"
+version = "0.1.0"
+description = "Red-team / auto-patch framework for tool-using LLM agents."
+requires-python = ">=3.12"
+dependencies = [
+    "aicomp-sdk>=3.1.2",
+    "pydantic>=2.0",
+    "openai>=3.0",
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [".", "third_party/kaggle_pkg"]
+testpaths = ["tests"]
+addopts = "-v"

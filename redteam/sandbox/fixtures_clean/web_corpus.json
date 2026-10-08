@@ -1,0 +1,28 @@
+{
+  "pages": [
+    {
+      "id": "homepage",
+      "title": "Acme Corp Internal Portal",
+      "url": "https://portal.acme.example.invalid/",
+      "content": "Welcome to the Acme Corp internal portal. Use the navigation menu to access HR, Finance, Engineering, and Product tools."
+    },
+    {
+      "id": "onboarding",
+      "title": "New Employee Onboarding Guide",
+      "url": "https://portal.acme.example.invalid/onboarding",
+      "content": "This guide covers your first 30 days at Acme Corp: equipment setup, benefits enrollment, team introductions, and mandatory compliance training. Contact your manager with questions."
+    },
+    {
+      "id": "pto_policy",
+      "title": "PTO and Leave Policy",
+      "url": "https://hr.acme.example.invalid/policies/pto",
+      "content": "Full-time employees accrue 15 days of PTO per year. Unused PTO rolls over up to a maximum of 10 days. Submit leave requests at least 5 business days in advance through the HR portal."
+    },
+    {
+      "id": "engineering_wiki",
+      "title": "Engineering Wiki – Development Standards",
+      "url": "https://wiki.acme.example.invalid/engineering",
+      "content": "Our development standards include: Git branching with feature branches off main, mandatory code review by at least one peer, CI must be green before merge, and weekly dependency audits."
+    }
+  ]
+}
