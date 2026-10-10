@@ -35,6 +35,7 @@ from redteam.replay.stats import wilson_interval
 
 MIN_DATE_CUTOFF = "20261004"
 TAINT_PREFIX_CUTOFF = "20261006"
+TAINT_FILES_CUTOFF = "20261009"
 
 METHODOLOGY_LIMITATIONS = [
     "results are for one victim model (qwen2.5:7b) and one fixture set",
@@ -93,6 +94,8 @@ def classify_attack_file(path: Path) -> tuple[str, str, str] | None:
     model, raw_guardrail, date_str, _time_str = m.groups()
     if raw_guardrail == "taint" and date_str < TAINT_PREFIX_CUTOFF:
         effective_guardrail = "taint_prefix"
+    elif raw_guardrail == "taint" and date_str >= TAINT_FILES_CUTOFF:
+        effective_guardrail = "taint_files"
     else:
         effective_guardrail = raw_guardrail
     return model, effective_guardrail, date_str
@@ -374,11 +377,12 @@ def build_taxonomy(runs_dir: Path | str) -> TaxonomyDict:
             })
             continue
 
-        effective_g = (
-            "taint_prefix"
-            if (raw_guardrail == "taint" and date_str < TAINT_PREFIX_CUTOFF)
-            else raw_guardrail
-        )
+        if raw_guardrail == "taint" and date_str < TAINT_PREFIX_CUTOFF:
+            effective_g = "taint_prefix"
+        elif raw_guardrail == "taint" and date_str >= TAINT_FILES_CUTOFF:
+            effective_g = "taint_files"
+        else:
+            effective_g = raw_guardrail
         files_used.append({"name": path.name, "n_rows": len(valid_rows)})
 
         for r in valid_rows:

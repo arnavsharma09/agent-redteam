@@ -107,8 +107,8 @@ class TaintConfig:
         Tool names that can exfiltrate or destructively alter data.
     untrusted_sources:
         Source labels (as set by the SDK's ToolContext.mark_source) whose
-        outputs are treated as untrusted.  Note: ``"file"`` is intentionally
-        absent — fs.read of seed files is trusted because the user owns them.
+        outputs are treated as untrusted.  The default is {email, web, file}: a
+        planted file is untrusted (fs.read output is checked like email and web).
     action:
         Decision to emit when a tainted argument is detected.
     min_token_len:
@@ -139,7 +139,7 @@ class TaintConfig:
         "fs.delete",
         "fs.write",
     )
-    untrusted_sources: frozenset[str] = frozenset({"email", "web"})
+    untrusted_sources: frozenset[str] = frozenset({"email", "web", "file"})
     action: str = "DENY"
     min_token_len: int = 6
     allowlist_domains: tuple[str, ...] = ()
