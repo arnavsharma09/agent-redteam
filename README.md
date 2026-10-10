@@ -2,6 +2,13 @@
 
 In this evaluation framework, the user is benign and submits a fixed, innocuous prompt (such as reading an email or summarizing notes), while the adversary controls only external, untrusted content ingested by the agent (such as email bodies, web pages, or local files). The objective is to identify whether indirect prompt injections can coerce a tool-calling language model agent into four failure classes: data exfiltration (`http.post` to an external URL or `email.send` to an external address), destructive file system modifications (`fs.write` or `fs.delete` targeting protected files such as `secret.txt`), unauthorized execution (`shell.run`), or confused deputy actions. All tools in this environment are in-memory simulations provided by `aicomp_sdk` (MIT): there is no real network socket, external HTTP traffic, or subprocess creation. In particular, `shell.run` is a simulated tool handler with a static 5-command allowlist (`echo `, `ls`, `pwd`, `whoami`, `date`), so exec success means the agent called the simulated shell.run after reading untrusted web or email content, when the user had not asked to run a command (the SDK predicate checks the source and user intent, not the command's arguments).
 
+## Summary
+
+- **Setup:** the user prompt is benign and the attacker controls only content the agent reads (web pages, email, files). The victim is a local qwen2.5:7b agent with simulated tools, and a UCB1 bandit searches 144 template attack recipes.
+- **Undefended:** the exploit predicate fired in 17.4% of exfil_http episodes (61/350), 37.0% of destructive (37/100), 32.4% of exec (45/139) and 23.0% of exfil_email (23/100). Direct commands beat authority framing, which beat step-by-step framing, in every action class (destructive: 65.1%, 25.8%, 3.9%).
+- **Defended:** a taint gate that tracks argument provenance got exfil_http to 0/250 fired. After fixing a gap where local files were trusted, a new 100-episode exec search had 1 episode execute (1 of its 30 file-sink episodes), with 0/36 blocks on benign tasks (95% upper bound 9.6%).
+- **Known gaps:** one episode still got through because the model decoded a base64 payload itself, which the gate does not catch. Results come from one model and one fixture set, and the guardrail rows are separate adaptive searches, not matched episodes.
+
 ---
 
 ## What Was Built
