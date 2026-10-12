@@ -378,7 +378,11 @@ class TaintGuardrail(GuardrailBase):
         for ev in self._env.trace.tool_events:
             if ev.source in self.config.untrusted_sources and ev.ok:
                 parts.append(ev.output or "")
-        return " ".join(parts)
+        joined = " ".join(parts)
+        decoded = _decoded_base64_variants(joined)
+        if decoded:
+            return f"{joined} {' '.join(decoded)}" if joined else " ".join(decoded)
+        return joined
 
     def _collect_trusted_text(self, context: Mapping[str, Any]) -> str:
         """Concatenate all user messages (ground truth of user intent)."""
@@ -421,6 +425,37 @@ class TaintGuardrail(GuardrailBase):
 _URL_RE = re.compile(r"https?://[^\s\"'>]+", re.IGNORECASE)
 _EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
 _HOST_RE = re.compile(r"(?:https?://)?([a-zA-Z0-9.\-]+)(?:/|$)", re.IGNORECASE)
+_BASE64_RUN_RE = re.compile(
+    r"(?<![A-Za-z0-9+/=])[A-Za-z0-9+/]{8,}={0,2}(?![A-Za-z0-9+/=])"
+)
+
+
+def _decoded_base64_variants(text: str) -> list[str]:
+    """Find and decode base64 runs embedded in text."""
+    if not text:
+        return []
+    variants: list[str] = []
+    runs = _BASE64_RUN_RE.findall(text)
+    if len(runs) > 200:
+        runs = runs[:200]
+    for run in runs:
+        if len(run) > 4096:
+            run = run[:4096]
+        padded = run + "=" * (-len(run) % 4)
+        try:
+            raw_bytes = base64.b64decode(padded)
+            decoded = raw_bytes.decode("utf-8")
+            cleaned = decoded.strip()
+            if (
+                cleaned.isascii()
+                and len(cleaned) >= 4
+                and all(c.isprintable() or c in "\n\t" for c in cleaned)
+            ):
+                if cleaned not in variants:
+                    variants.append(cleaned)
+        except Exception:
+            pass
+    return variants
 
 
 def _normalize_path(path: str) -> str:
