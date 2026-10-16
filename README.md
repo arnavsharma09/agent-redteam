@@ -8,7 +8,12 @@ In this evaluation framework, the user is benign and submits a fixed, innocuous 
 - **Undefended:** the exploit predicate fired in 17.4% of exfil_http episodes (61/350), 37.0% of destructive (37/100), 32.4% of exec (45/139) and 23.0% of exfil_email (23/100). Direct commands beat authority framing, which beat step-by-step framing, in every action class (destructive: 65.1%, 25.8%, 3.9%).
 - **Defended:** a taint gate that tracks argument provenance got exfil_http to 0/250 fired. After fixing a gap where local files were trusted, a new 100-episode exec search had 1 episode execute (1 of its 30 file-sink episodes), with 0/36 blocks on benign tasks (95% upper bound 9.6%). After a later change that decodes base64 in untrusted text, a further 100-episode exec search had 0 episodes execute on any sink (a separate search, not matched episodes).
 - **Known gaps:** one episode got through because the model decoded a base64 payload itself; a later change now decodes base64 in untrusted text, but other self-applied encodings are not handled. Results come from one model and one fixture set, and the guardrail rows are separate adaptive searches, not matched episodes.
-
+### Quickstart & Verification Suite
+```bash
+git clone [https://github.com/arnavsharma09/agent-redteam.git](https://github.com/arnavsharma09/agent-redteam.git)
+cd agent-redteam && pip install -r requirements.txt
+pytest -v  # Executes the test suite & taint-tracking validation
+```
 ---
 
 ## What Was Built
